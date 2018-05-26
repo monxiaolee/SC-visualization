@@ -1,14 +1,11 @@
 <template>
   <div class="castle">
-    <!-- 暂时注册掉页面内容 -->
-    <!-- 
     <TopSide :title="title"></TopSide>
     <TopMid></TopMid>
     <Left></Left>
     <Right></Right>
     <MapHeat></MapHeat>
     <Foot></Foot> 
-    -->
   </div>
 </template>
 <script>
