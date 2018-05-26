@@ -17,17 +17,22 @@ export default {
       size: 10,
       height: 20,
       color: '#ff0000',
+      imgUrl: require('../../assets/images/material/map_indexed.png'),
       scene: null,
       camera: null,
+      normalMaterial: null,
       mapIndexedImage: null,
-      shaderMaterial: null
+      mapOutlineImage: null,
+      shaderMaterial: null,
+      uniforms: null
     }
   },
   methods: {
     start () {
       this.mapIndexedImage = new Image()
       // this.mapIndexedImage.src = '../../assets/'
-      this.mapIndexedImage.src = '../../assets/images/material/map_indexed.png'
+      this.mapIndexedImage.src = this.imgUrl
+      console.log(this.imgUrl)
     },
     initScene () {
       this.scene = new THREE.Scene()
@@ -51,9 +56,8 @@ export default {
       lookupCanvas.width = 256
       lookupCanvas.height = 1
 
-      this.shaderMaterial = new THREE.ShaderMaterial({
-        color: 0xffffff
-      })
+      // 定义一个基础材质测试备用
+      // this.normalMaterial = new THREE.MeshNormalMaterial()
 
       let lookupTexture = new THREE.Texture(lookupCanvas)
       lookupTexture.magFilter = THREE.NearestFilter
@@ -64,12 +68,29 @@ export default {
       indexedMapTexture.needsUpdate = true
       indexedMapTexture.magFilter = THREE.NearestFilter
       indexedMapTexture.minFilter = THREE.NearestFilter
+
+      let outlinedMapTexture = new THREE.Texture(this.mapOutlineImage)
+      outlinedMapTexture.needsUpdate = true
+
+      this.uniforms = {
+        'mapIndex': {type: 't', value: 0, texture: indexedMapTexture},
+        'lookup': {type: 't', value: 1, texture: lookupTexture},
+        'outline': {type: 't', value: 2, texture: outlinedMapTexture},
+        'outlineLevel': {type: 'f', value: 1}
+      }
+
+      this.shaderMaterial = new THREE.ShaderMaterial({
+        uniforms: this.uniforms
+      })
+
       // let backMat = new THREE.MeshBasicMaterial({})
-      let sphere = new THREE.Mesh(new THREE.SphereGeometry(100, 40, 40), this.shaderMaterialshaderMaterial)
+      let sphere = new THREE.Mesh(new THREE.SphereGeometry(100, 40, 40), this.shaderMaterial)
       sphere.doubleSided = false
       sphere.rotation.x = Math.PI
       sphere.rotation.y = -Math.PI / 2
       sphere.rotation.z = Math.PI
+
+      this.scene.add(sphere)
 
       // 定义摄像机
       this.camera = new THREE.PerspectiveCamera(12, window.innerWidth / window.innerHeight, 1, 20000)
@@ -80,14 +101,14 @@ export default {
 
       let renderer = new THREE.WebGLRenderer({antialias: false})
       renderer.setSize(window.innerWidth, window.innerHeight)
-      renderer.autoClear = false
+      // renderer.autoClear = false
+      // renderer.sortObjects = false
+      // renderer.generateMipmaps = false
 
-      renderer.sortObjects = false
-      renderer.generateMipmaps = false
+      renderer.render(this.scene, this.camera)
 
       this.$refs.model.appendChild(renderer.domElement)
-
-      console.log(sphere)
+      console.log(renderer.domElement)
     }
   },
   created () {
