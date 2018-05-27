@@ -24,6 +24,8 @@ export default {
       mapIndexedImage: null,
       mapOutlineImage: null,
       shaderMaterial: null,
+      vertexShader: '',
+      globeFragmentShader: '',
       uniforms: null
     }
   },
@@ -57,7 +59,7 @@ export default {
       lookupCanvas.height = 1
 
       // 定义一个基础材质测试备用
-      // this.normalMaterial = new THREE.MeshNormalMaterial()
+      // this.normalMaterial = new THREE.MeshNormalMaterial({})
 
       let lookupTexture = new THREE.Texture(lookupCanvas)
       lookupTexture.magFilter = THREE.NearestFilter
@@ -79,8 +81,42 @@ export default {
         'outlineLevel': {type: 'f', value: 1}
       }
 
+      this.vertexShader = 'vuniform float amplitude;' +
+      'attribute float size;' +
+      'attribute vec3 customColor;' +
+      'varying vec3 vColor;' +
+      'void main() {' +
+      'vColor = customColor;' +
+      'vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );' +
+      'gl_PointSize = size;' +
+      'gl_Position = projectionMatrix * mvPosition;' +
+      '}'
+
+      this.globeFragmentShader = 'uniform sampler2D mapIndex;' +
+      'uniform sampler2D mapIndex;' +
+      'uniform sampler2D lookup;' +
+      'uniform sampler2D outline;' +
+      'uniform float outlineLevel;' +
+      'varying vec3 vNormal;' +
+      'varying vec2 vUv;' +
+      'void main () {' +
+      'vec4 mapColor = texture2D(mapIndex, vUv);' +
+      'float indexedColor = mapColor.x;' +
+      'vec2 lookupUV = vec2( indexedColor, 0. );' +
+      'vec4 lookupColor = texture2D(lookup, lookupUV);' +
+      'float mask = lookupColor.x + (1.-outlineLevel) * indexedColor;' +
+      'mask = clamp(mask,0.,1.);' +
+      'float outlineColor = texture2D(outline, vUv).x * outlineLevel;' +
+      'float diffuse = mask + outlineColor;' +
+      'gl_FragColor = vec4(vec3(diffuse), 1.);' +
+      '}'
+
+      console.log(this.vertexShader)
+
       this.shaderMaterial = new THREE.ShaderMaterial({
-        uniforms: this.uniforms
+        uniforms: this.uniforms,
+        vertexShader: this.vertexShader,
+        fragmentShader: this.globeFragmentShader
       })
 
       // let backMat = new THREE.MeshBasicMaterial({})
