@@ -64,7 +64,7 @@ export default {
       this.mapIndexedImage = new Image()
       // this.mapIndexedImage.src = '../../assets/'
       this.mapIndexedImage.src = this.imgUrl
-      console.log(this.imgUrl)
+      console.log(this.mapIndexedImage)
     },
     initScene () {
       this.scene = new THREE.Scene()
@@ -106,7 +106,7 @@ export default {
 
       this.uniforms = {
         // 'mapIndex': {type: 't', value: 0, texture: indexedMapTexture}
-        'mapIndex': {type: 't', value: 0, texture: new THREE.TextureLoader().load(this.imgUrl)}
+        'mapIndex': {type: 't', value: 0, texture: indexedMapTexture}
         // 'lookup': {type: 't', value: 1, texture: lookupTexture},
         // 'outline': {type: 't', value: 2, texture: outlinedMapTexture},
         // 'outlineLevel': {type: 'f', value: 1}
@@ -140,6 +140,7 @@ export default {
       // 'gl_FragColor = vec4(vec3(diffuse), 1.),' +
       // '}'
 
+      console.log()
       this.shaderMaterial = new THREE.ShaderMaterial({
         uniforms: this.uniforms,
         // vertexShader: this.vertexShader
@@ -149,7 +150,6 @@ export default {
       })
 
       console.log(this.shaderMaterial)
-
       // let backMat = new THREE.MeshBasicMaterial({})
       let sphere = new THREE.Mesh(new THREE.SphereGeometry(100, 40, 40), this.shaderMaterial)
       sphere.doubleSided = false
@@ -157,8 +157,8 @@ export default {
       sphere.rotation.y = -Math.PI / 2
       sphere.rotation.z = Math.PI
 
-      rotating.add(sphere)
-      // this.scene.add(sphere)
+      // rotating.add(sphere)
+      this.scene.add(sphere)
 
       // 定义摄像机
       this.camera = new THREE.PerspectiveCamera(12, window.innerWidth / window.innerHeight, 1, 20000)
