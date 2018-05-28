@@ -1,5 +1,36 @@
 <template>
   <div ref='model'>
+    <div ref='vertexShader'>
+      varying vec3 vNormal;
+			varying vec2 vUv;
+			void main() {
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0);
+				vNormal = normalize( normalMatrix * normal );
+				vUv = uv;
+			}
+    </div>
+    <div ref="globeFragmentShader">
+      uniform sampler2D mapIndex;
+			uniform sampler2D lookup;
+			uniform sampler2D outline;
+			uniform float outlineLevel;
+			varying vec3 vNormal;
+			varying vec2 vUv;
+			void main() {
+
+				vec4 mapColor = texture2D( mapIndex, vUv );
+				float indexedColor = mapColor.x;
+				vec2 lookupUV = vec2( indexedColor, 0. );
+				vec4 lookupColor = texture2D( lookup, lookupUV );
+				float mask = lookupColor.x + (1.-outlineLevel) * indexedColor;
+				mask = clamp(mask,0.,1.);
+				float outlineColor = texture2D( outline, vUv ).x * outlineLevel;
+				float diffuse = mask + outlineColor;
+				gl_FragColor = vec4( vec3(diffuse), 1.  );
+				// gl_FragColor = vec4( lookupColor );
+				// gl_FragColor = vec4(texture2D( lookup, vUv ).xyz,1.);
+			}
+    </div>
   </div>
 </template>
 <script>
@@ -24,7 +55,6 @@ export default {
       mapIndexedImage: null,
       mapOutlineImage: null,
       shaderMaterial: null,
-      vertexShader: '',
       globeFragmentShader: '',
       uniforms: null
     }
@@ -75,49 +105,50 @@ export default {
       outlinedMapTexture.needsUpdate = true
 
       this.uniforms = {
-        'mapIndex': {type: 't', value: 0, texture: indexedMapTexture},
-        'lookup': {type: 't', value: 1, texture: lookupTexture},
-        'outline': {type: 't', value: 2, texture: outlinedMapTexture},
-        'outlineLevel': {type: 'f', value: 1}
+        // 'mapIndex': {type: 't', value: 0, texture: indexedMapTexture}
+        'mapIndex': {type: 't', value: 0, texture: new THREE.TextureLoader().load(this.imgUrl)}
+        // 'lookup': {type: 't', value: 1, texture: lookupTexture},
+        // 'outline': {type: 't', value: 2, texture: outlinedMapTexture},
+        // 'outlineLevel': {type: 'f', value: 1}
       }
 
-      this.vertexShader = 'vuniform float amplitude;' +
-      'attribute float size;' +
-      'attribute vec3 customColor;' +
-      'varying vec3 vColor;' +
-      'void main() {' +
-      'vColor = customColor;' +
-      'vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );' +
-      'gl_PointSize = size;' +
-      'gl_Position = projectionMatrix * mvPosition;' +
-      '}'
+      // 顶点材质
+      // this.vertexShader = 'varying vec3 vNormal,' +
+      // 'varying vec2 vUv,' +
+      // 'void main () {' +
+      // 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0),' +
+      // 'vNormal = normalize(normalMatrix * normal),' +
+      // 'vUv = uv,' +
+      // '}'
 
-      this.globeFragmentShader = 'uniform sampler2D mapIndex;' +
-      'uniform sampler2D mapIndex;' +
-      'uniform sampler2D lookup;' +
-      'uniform sampler2D outline;' +
-      'uniform float outlineLevel;' +
-      'varying vec3 vNormal;' +
-      'varying vec2 vUv;' +
-      'void main () {' +
-      'vec4 mapColor = texture2D(mapIndex, vUv);' +
-      'float indexedColor = mapColor.x;' +
-      'vec2 lookupUV = vec2( indexedColor, 0. );' +
-      'vec4 lookupColor = texture2D(lookup, lookupUV);' +
-      'float mask = lookupColor.x + (1.-outlineLevel) * indexedColor;' +
-      'mask = clamp(mask,0.,1.);' +
-      'float outlineColor = texture2D(outline, vUv).x * outlineLevel;' +
-      'float diffuse = mask + outlineColor;' +
-      'gl_FragColor = vec4(vec3(diffuse), 1.);' +
-      '}'
-
-      console.log(this.vertexShader)
+      // this.globeFragmentShader = 'uniform sampler2D mapIndex,' +
+      // 'uniform sampler2D mapIndex,' +
+      // 'uniform sampler2D lookup,' +
+      // 'uniform sampler2D outline,' +
+      // 'uniform float outlineLevel,' +
+      // 'varying vec3 vNormal,' +
+      // 'varying vec2 vUv,' +
+      // 'void main () {' +
+      // 'vec4 mapColor = texture2D(mapIndex, vUv),' +
+      // 'float indexedColor = mapColor.x,' +
+      // 'vec2 lookupUV = vec2(indexedColor, 0.),' +
+      // 'vec4 lookupColor = texture2D(lookup, lookupUV),' +
+      // 'float mask = lookupColor.x + (1.-outlineLevel) * indexedColor,' +
+      // 'mask = clamp(mask,0.,1.),' +
+      // 'float outlineColor = texture2D(outline, vUv).x * outlineLevel,' +
+      // 'float diffuse = mask + outlineColor,' +
+      // 'gl_FragColor = vec4(vec3(diffuse), 1.),' +
+      // '}'
 
       this.shaderMaterial = new THREE.ShaderMaterial({
         uniforms: this.uniforms,
-        vertexShader: this.vertexShader,
-        fragmentShader: this.globeFragmentShader
+        // vertexShader: this.vertexShader
+        // fragmentShader: this.globeFragmentShader
+        vertexShader: this.$refs.vertexShader.textContent,
+        fragmentShader: this.$refs.globeFragmentShader.textContent
       })
+
+      console.log(this.shaderMaterial)
 
       // let backMat = new THREE.MeshBasicMaterial({})
       let sphere = new THREE.Mesh(new THREE.SphereGeometry(100, 40, 40), this.shaderMaterial)
@@ -126,7 +157,8 @@ export default {
       sphere.rotation.y = -Math.PI / 2
       sphere.rotation.z = Math.PI
 
-      this.scene.add(sphere)
+      rotating.add(sphere)
+      // this.scene.add(sphere)
 
       // 定义摄像机
       this.camera = new THREE.PerspectiveCamera(12, window.innerWidth / window.innerHeight, 1, 20000)
