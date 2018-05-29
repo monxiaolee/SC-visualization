@@ -1,5 +1,6 @@
 <template>
   <div ref='model'>
+    <div>{{mapIndexedImage}}</div>
     <div ref='vertexShader'>
       varying vec3 vNormal;
 			varying vec2 vUv;

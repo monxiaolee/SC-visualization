@@ -10,6 +10,7 @@ import Layout from '@/components/Layout'
 import Castle from '@/components/fantasy/castle/Castle'
 import Fireworks from '@/components/stride/fireworks/Fireworks'
 import Sailor from '@/components/excleamation/sailor/Sailor'
+import World from '@/components/state/world/World'
 Vue.use(Router)
 export default new Router({
   routes: [{
@@ -25,6 +26,9 @@ export default new Router({
     }, {
       path: 'excleamation/sailor',
       component: Sailor
+    }, {
+      path: 'state/world',
+      component: World
     }]
   }]
 })

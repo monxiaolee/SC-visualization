@@ -27,6 +27,14 @@
               </li>
             </ul>
           </div>
+          <div class="side-nav-list">
+            <p class="side-nav-til excleamation">第四块大屏专题</p>
+            <ul>
+              <li>
+                <router-link to="/state/world" replace>测试元素</router-link>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="side-nav-btn" @click="navBtn" :class="{active:navShow}">
           <span class="side-nav-arrow"></span>
@@ -73,7 +81,7 @@
   .side-nav-content {
     display: inline-block;
     height: 100%;
-    margin-top: 80px;
+    margin-top: 30px;
     width: 100%;
   }
 
@@ -96,13 +104,13 @@
 
   .side-nav-list {
     width: 100%;
-    margin-bottom: 80px;
+    margin-bottom: 20px;
   }
 
   .side-nav-til {
-    font-size: 36px;
+    font-size: 14px;
     color: #00ffff;
-    height: 186px;
+    height: 100px;
     width: 100%;
     padding-top: 106px;
     box-sizing: border-box;
@@ -141,7 +149,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #436979;
-    font-size: 36px;
+    font-size: 14px;
     text-align: center;
     padding: 0 20px;
     box-sizing: border-box;

@@ -13,8 +13,8 @@ export default {
 <style scoped>
 h1 {
   color: #ffffff;
-  font-size: 56px;
-  line-height: 100px;
+  font-size: 18px;
+  line-height: 60px;
   text-align: center;
 }
 </style>
