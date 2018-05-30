@@ -8,7 +8,7 @@ import EarthImg from '@/assets/images/world/Earth.png'
 import EarthSpecImg from '@/assets/images/world/EarthSpec.png'
 import EarthNormalImg from '@/assets/images/world/EarthNormal.png'
 
-import RenderPass from '@/libs/postprocessing/RenderPass'
+// import RenderPass from '@/libs/postprocessing/RenderPass'
 
 export default {
   name: 'WorldMap',
@@ -64,7 +64,7 @@ export default {
       this.spotLight.intensity = 0.6
       this.scene.add(this.spotLight)
 
-      let renderPass = RenderPass(this.scene, this.camera)
+      let renderPass = new THREE.RenderPass(this.scene, this.camera)
       let effectCopy = new THREE.ShaderPass(THREE.CopyShader)
       effectCopy.renderToScreen = true
       let shaderPass = new THREE.ShaderPass(THREE.CustomGrayScaleShader)
