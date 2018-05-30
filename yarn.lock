@@ -7265,6 +7265,16 @@ text-table@^0.2.0, text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
+three-copyshader@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/three-copyshader/-/three-copyshader-0.0.1.tgz#ddfa6c3f5dbce596187cfbf4ce1b46c7fbd456c0"
+
+three-effectcomposer@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/three-effectcomposer/-/three-effectcomposer-0.0.1.tgz#09f438bfc76e522a985e5b8867d6b407eddd1d12"
+  dependencies:
+    three-copyshader "0.0.1"
+
 three.js@^0.77.1:
   version "0.77.1"
   resolved "https://registry.yarnpkg.com/three.js/-/three.js-0.77.1.tgz#07858a8749e4b627a31083252a2d987776cca32a"

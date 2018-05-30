@@ -16,6 +16,7 @@
   "dependencies": {
     "dat.gui": "^0.7.2",
     "stats-js": "^1.0.0-alpha1",
+    "three-effectcomposer": "0.0.1",
     "three.js": "^0.77.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"

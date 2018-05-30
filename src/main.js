@@ -5,6 +5,9 @@ import App from './App'
 import router from './router'
 import './assets/css/reset.css'
 import './assets/css/common.css'
+
+// import './libs/postprocessing/RenderPass'
+// import './libs/postprocessing/ShaderPass'
 // import zoom from './assets/scripts/tool/zoom'
 // zoom()
 // window.addEventListener('resize', zoom)

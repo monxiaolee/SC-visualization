@@ -8,6 +8,8 @@ import EarthImg from '@/assets/images/world/Earth.png'
 import EarthSpecImg from '@/assets/images/world/EarthSpec.png'
 import EarthNormalImg from '@/assets/images/world/EarthNormal.png'
 
+import RenderPass from '@/libs/postprocessing/RenderPass'
+
 export default {
   name: 'WorldMap',
   data () {
@@ -22,7 +24,8 @@ export default {
       sphere: null,
       clock: null,
       ambi: null,
-      spotLight: null
+      spotLight: null,
+      composer: null
     }
   },
   methods: {
@@ -35,7 +38,7 @@ export default {
       this.webGLRenderer = new THREE.WebGLRenderer()
       this.webGLRenderer.setClearColor(0x000, 1.0)
       this.webGLRenderer.setSize(window.innerWidth, window.innerHeight)
-      this.webGLRenderer.shadowMapEnabled = true
+      this.webGLRenderer.shadowMap.enabled = true
       // 球體
       this.sphere = this.createMesh(new THREE.SphereGeometry(10, 40, 40))
       this.scene.add(this.sphere)
@@ -46,8 +49,10 @@ export default {
 
       this.camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-      this.orbitControls = new THREE.OrbitControls(this.camera)
-      this.orbitControls.autoRotate = false
+      this.scene.add(this.camera)
+
+      // this.orbitControls = new THREE.OrbitControls(this.camera)
+      // this.orbitControls.autoRotate = false
 
       this.clock = new THREE.Clock()
 
@@ -59,10 +64,21 @@ export default {
       this.spotLight.intensity = 0.6
       this.scene.add(this.spotLight)
 
-      this.$refs.worldWrapper.append(this.webGLRenderer.domElement)
+      let renderPass = RenderPass(this.scene, this.camera)
+      let effectCopy = new THREE.ShaderPass(THREE.CopyShader)
+      effectCopy.renderToScreen = true
+      let shaderPass = new THREE.ShaderPass(THREE.CustomGrayScaleShader)
+      shaderPass.enabled = false
+      let bitPass = new THREE.ShaderPass(THREE.CustomBitShader)
+      bitPass.enabled = false
 
-      console.log('--------------')
-      console.log(this.sphere)
+      this.composer = new THREE.EffectComposer(this.webGLRenderer)
+      this.composer.addPass(renderPass)
+      this.composer.addPass(shaderPass)
+      this.composer.addPass(bitPass)
+      this.composer.addPass(effectCopy)
+
+      this.$refs.worldWrapper.append(this.webGLRenderer.domElement)
     },
     createMesh (geom) {
       let planetTexture = THREE.ImageUtils.loadTexture(this.EarthImg)
@@ -76,14 +92,26 @@ export default {
       planetMaterial.normalMap = normalTexture
       planetMaterial.map = planetTexture
 
+      // 定義一個基礎材質測試 MeshBasicMaterial
+      // let meshBasicMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc})
+
       let mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [planetMaterial])
-      console.log(planetTexture, specularTexture, normalTexture, planetMaterial)
+      // let mesh = new THREE.Mesh(geom, meshBasicMaterial)
       return mesh
+    },
+    render () {
+      console.log('執行渲染函數')
+      // console.log(this.scene, this.camera)
+      let delta = this.clock.getDelta()
+      console.log(delta)
+      this.orbitControls.update(delta)
+      this.webGLRenderer.render(this.scene, this.camera)
     }
   },
   mounted () {
     this.initScene()
-    this.createMesh()
+    this.render()
+    // this.createMesh()
   },
   components: {}
 }
